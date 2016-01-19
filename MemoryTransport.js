@@ -5,7 +5,7 @@
  *  IOTDB.org
  *  2016-01-18
  *
- *  Copyright [2013-2015] [David P. Janes]
+ *  Copyright [2013-2016] [David P. Janes]
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ var iotdb_transport = require('iotdb-transport');
 var _ = iotdb._;
 
 var path = require('path');
+var events = require('events');
 
 var util = require('util');
 var url = require('url');
@@ -36,12 +37,17 @@ var logger = iotdb.logger({
     module: 'MemoryTransport',
 });
 
+var global = {};
+
+var global_emitter = new events.EventEmitter();
+global_emitter.setMaxListeners(0);
+
 /* --- constructor --- */
 
 /**
  *  Create a transport for Memory.
  */
-var MemoryTransport = function (initd, native) {
+var MemoryTransport = function (initd, bddd) {
     var self = this;
 
     self.initd = _.defaults(
@@ -60,7 +66,7 @@ var MemoryTransport = function (initd, native) {
         }
     );
     
-    self.native = native;
+    self.bddd = bddd || global;
 };
 
 MemoryTransport.prototype = new iotdb_transport.Transport;
@@ -110,13 +116,22 @@ MemoryTransport.prototype.get = function(paramd, callback) {
 
     self._validate_get(paramd, callback);
 
-    var channel = self.initd.channel(self.initd, paramd.id, paramd.band);
+    paramd = _.shallowCopy(paramd);
 
-    // callback(id, band, null); does not exist
-    // OR
-    // callback(id, band, undefined); don't know
-    // OR
-    // callback(id, band, d); data
+    var bdd = self.bddd[paramd.id];
+    if (bdd === undefined) {
+        paramd.value = null;
+        return callback(paramd);
+    }
+
+    var bd = bdd[paramd.band];
+    if (bd === undefined) {
+        paramd.value = null;
+        return callback(paramd);
+    }
+
+    paramd.value = bd;
+    callback(paramd);
 };
 
 /**
@@ -127,18 +142,19 @@ MemoryTransport.prototype.update = function(paramd, callback) {
 
     self._validate_updated(paramd, callback);
 
-    var channel = self.initd.channel(self.initd, paramd.id, paramd.band);
-    var d = self.initd.pack(paramd.value, paramd.id, paramd.band);
+    paramd = _.shallowCopy(paramd);
 
-    logger.error({
-        method: "update",
-        channel: channel,
-        d: d,
-    }, "NOT IMPLEMENTED");
+    var bdd = self.bddd[paramd.id];
+    if (bdd === undefined) {
+        bdd = {};
+        self.bddd[paramd.id] = bdd;
+    }
 
-    callback({
-        error: new Error("not implemented");
-    });
+    bdd[paramd.band] = paramd.value;
+
+    callback(paramd);
+
+    global_emitter.emit("updated", self.bddd, paramd);
 };
 
 /**
@@ -153,6 +169,18 @@ MemoryTransport.prototype.updated = function(paramd, callback) {
     }
 
     self._validate_updated(paramd, callback);
+
+    global_emitter.on("updated", function(bddd, ud) {
+        if (paramd.id && (paramd.id !== ud.id)) {
+            return;
+        }
+
+        if (paramd.band && (paramd.band !== ud.band)) {
+            return;
+        }
+
+        callback(ud);
+    });
 };
 
 /**

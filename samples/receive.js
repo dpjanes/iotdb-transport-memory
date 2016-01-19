@@ -13,10 +13,8 @@ var Transport = require('../MemoryTransport').MemoryTransport;
 
 var transport = new Transport({
 });
-transport.updated({
-    id: "MyThingID", 
-    band: "meta", 
-}, function(ud) {
+
+var received = function(ud) {
     if (ud.value === undefined) {
         transport.get(ud, function(gd) {
             console.log("+", gd.id, gd.band, gd.value);
@@ -24,4 +22,13 @@ transport.updated({
     } else {
         console.log("+", ud.id, ud.band, ud.value);
     }
-});
+}
+
+transport.get({
+    id: "MyThingID", 
+    band: "meta", 
+}, received);
+transport.updated({
+    id: "MyThingID", 
+    band: "meta", 
+}, received);

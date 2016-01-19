@@ -11,13 +11,12 @@
 
 var Transport = require('../MemoryTransport').MemoryTransport;
 
-var transport = new Transport({
-});
+/* --- write--- */
+var write_transport = new Transport({});
 
 var _update = function() {
     var now = (new Date()).toISOString();
-    console.log("+ sent update", now);
-    transport.update({
+    write_transport.update({
         id: "MyThingID", 
         band: "meta", 
         value: {
@@ -25,8 +24,32 @@ var _update = function() {
             last: "Janes",
             now: now,
         },
+    }, function(ud) {
+        console.log("+ sent", ud);
     });
 };
 
-setInterval(_update, 10 * 1000);
+setInterval(_update, 5 * 1000);
 _update();
+
+/* --- read --- */
+var read_transport = new Transport({});
+
+var received = function(ud) {
+    if (ud.value === undefined) {
+        read_transport.get(ud, function(gd) {
+            console.log("+", "received.update+get", gd.id, gd.band, gd.value);
+        });
+    } else {
+        console.log("+", "received.update", ud.id, ud.band, ud.value);
+    }
+}
+
+read_transport.get({
+    id: "MyThingID", 
+    band: "meta", 
+}, received);
+read_transport.updated({
+    id: "MyThingID", 
+    band: "meta", 
+}, received);
