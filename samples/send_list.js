@@ -1,12 +1,9 @@
 /*
- *  send.js
+ *  send_list.js
  *
  *  David Janes
  *  IOTDB.org
  *  2016-01-18
- *
- *  Demonstrate sending something
- *  Make sure to see README first
  */
 
 var Transport = require('../MemoryTransport').MemoryTransport;
@@ -29,14 +26,15 @@ var _update = function() {
     });
 };
 
-setInterval(_update, 5 * 1000);
 _update();
 
 /* --- read --- */
 var read_transport = new Transport({});
 
 var received = function(ud) {
-    if (ud.value === undefined) {
+    if (ud.error) {
+    } else if (ud.end) {
+    } else if (ud.value === undefined) {
         read_transport.get(ud, function(gd) {
             console.log("+", "received.update+get", gd.id, gd.band, gd.value);
         });
@@ -45,11 +43,4 @@ var received = function(ud) {
     }
 }
 
-read_transport.get({
-    id: "MyThingID", 
-    band: "meta", 
-}, received);
-read_transport.updated({
-    id: "MyThingID", 
-    band: "meta", 
-}, received);
+read_transport.list({}, received);
