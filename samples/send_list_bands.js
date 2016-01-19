@@ -1,5 +1,5 @@
 /*
- *  send_list.js
+ *  send_list_bands.js
  *
  *  David Janes
  *  IOTDB.org
@@ -38,6 +38,10 @@ var received = function(ud) {
         console.log("+", "received.end");
     } else {
         console.log("+", "received.update", ud.id);
+
+        read_transport.about(ud, function(ad) {
+            console.log("+", "received.about", ud.id, ad.bands);
+        });
     }
 }
 
