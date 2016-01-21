@@ -173,7 +173,7 @@ MemoryTransport.prototype.about = function(paramd, callback) {
 MemoryTransport.prototype.update = function(paramd, callback) {
     var self = this;
 
-    self._validate_updated(paramd, callback);
+    self._validate_update(paramd, callback);
 
     paramd = _.shallowCopy(paramd);
 
