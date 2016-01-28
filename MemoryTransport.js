@@ -146,10 +146,10 @@ MemoryTransport.prototype.get = function(paramd, callback) {
 /**
  *  See {iotdb_transport.Transport#Transport} for documentation.
  */
-MemoryTransport.prototype.about = function(paramd, callback) {
+MemoryTransport.prototype.bands = function(paramd, callback) {
     var self = this;
 
-    self._validate_about(paramd, callback);
+    self._validate_bands(paramd, callback);
 
     paramd = _.shallowCopy(paramd);
 
@@ -160,10 +160,11 @@ MemoryTransport.prototype.about = function(paramd, callback) {
         return callback(paramd);
     }
 
-    var keys = _.keys(bdd);
-    keys.sort();
+    paramd.bandd = {};
+    _.keys(bdd).map(function(key) {
+        paramd.bandd[key] = null;
+    };
 
-    paramd.bands = keys;
     callback(paramd);
 };
 
