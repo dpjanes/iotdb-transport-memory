@@ -170,7 +170,7 @@ MemoryTransport.prototype.about = function(paramd, callback) {
 /**
  *  See {iotdb_transport.Transport#Transport} for documentation.
  */
-MemoryTransport.prototype.update = function(paramd, callback) {
+MemoryTransport.prototype.put = function(paramd, callback) {
     var self = this;
 
     self._validate_update(paramd, callback);
