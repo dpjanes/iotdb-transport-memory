@@ -37,6 +37,11 @@ _update();
 var read_transport = new Transport({});
 
 var received = function(error, ud) {
+    if (error) {
+        console.log("#", error);
+        return;
+    }
+
     if (ud.value === undefined) {
         read_transport.get(ud, function(error, gd) {
             if (error) {
@@ -57,6 +62,6 @@ read_transport.get({
 read_transport.updated({
     id: "MyThingID", 
     band: "meta", 
-}, function(d) {
-    received(d.error, d);
-});
+}, received);
+
+

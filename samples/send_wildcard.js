@@ -36,7 +36,12 @@ _update();
 /* --- read --- */
 var read_transport = new Transport({});
 
-var received = function(ud) {
+var received = function(erorr, ud) {
+    if (error) {
+        console.log("#", error);
+        return;
+    }
+
     if (ud.value === undefined) {
         read_transport.get(ud, function(error, gd) {
             if (error) {

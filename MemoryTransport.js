@@ -196,7 +196,7 @@ MemoryTransport.prototype.updated = function(paramd, callback) {
             return;
         }
 
-        callback(ud);
+        callback(null, ud);
     });
 };
 
