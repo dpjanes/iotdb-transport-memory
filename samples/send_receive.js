@@ -32,9 +32,13 @@ _update();
 /* --- read --- */
 var read_transport = new Transport({});
 
-var received = function(ud) {
+var received = function(error, ud) {
     if (ud.value === undefined) {
-        read_transport.get(ud, function(gd) {
+        read_transport.get(ud, function(error, gd) {
+            if (error) {
+                console.log("#", error);
+                return;
+            }
             console.log("+", "received.update+get", gd.id, gd.band, gd.value);
         });
     } else {
@@ -49,4 +53,6 @@ read_transport.get({
 read_transport.updated({
     id: "MyThingID", 
     band: "meta", 
-}, received);
+}, function(d) {
+    received(d.error, d);
+});

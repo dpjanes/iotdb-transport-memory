@@ -24,6 +24,7 @@
 
 var iotdb = require('iotdb');
 var iotdb_transport = require('iotdb-transport');
+var errors = iotdb_transport.errors;
 var _ = iotdb._;
 
 var path = require('path');
@@ -116,21 +117,20 @@ MemoryTransport.prototype.get = function(paramd, callback) {
     self._validate_get(paramd, callback);
 
     paramd = _.shallowCopy(paramd);
+    paramd.value = null;
 
     var bdd = self.bddd[paramd.id];
     if (bdd === undefined) {
-        paramd.value = null;
-        return callback(paramd);
+        return callback(new errors.NotFound(), paramd);
     }
 
     var bd = bdd[paramd.band];
     if (bd === undefined) {
-        paramd.value = null;
-        return callback(paramd);
+        return callback(new errors.NotFound(), paramd);
     }
 
     paramd.value = bd;
-    callback(paramd);
+    callback(null, paramd);
 };
 
 /**
