@@ -166,7 +166,7 @@ MemoryTransport.prototype.put = function(paramd, callback) {
 
     self._validate_update(paramd, callback);
 
-    paramd = _.shallowCopy(paramd);
+    var pd = _.shallowCopy(paramd);
 
     var bdd = self.bddd[paramd.id];
     if (bdd === undefined) {
@@ -176,9 +176,9 @@ MemoryTransport.prototype.put = function(paramd, callback) {
 
     bdd[paramd.band] = paramd.value;
 
-    callback(paramd);
+    callback(null, pd);
 
-    global_emitter.emit("updated", self.bddd, paramd);
+    global_emitter.emit("updated", self.bddd, pd);
 };
 
 /**
