@@ -13,7 +13,7 @@ var write_transport = new Transport({});
 
 var _update = function() {
     var now = (new Date()).toISOString();
-    write_transport.update({
+    write_transport.put({
         id: "MyThingID", 
         band: "meta", 
         value: {

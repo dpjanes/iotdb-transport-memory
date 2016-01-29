@@ -80,11 +80,6 @@ MemoryTransport.prototype._class = "MemoryTransport";
 MemoryTransport.prototype.list = function(paramd, callback) {
     var self = this;
 
-    if (arguments.length === 1) {
-        paramd = {};
-        callback = arguments[0];
-    }
-
     self._validate_list(paramd, callback);
 
     var keys = _.keys(self.bddd);
@@ -106,11 +101,6 @@ MemoryTransport.prototype.list = function(paramd, callback) {
  */
 MemoryTransport.prototype.added = function(paramd, callback) {
     var self = this;
-
-    if (arguments.length === 1) {
-        paramd = {};
-        callback = arguments[0];
-    }
 
     self._validate_added(paramd, callback);
 
@@ -196,11 +186,6 @@ MemoryTransport.prototype.put = function(paramd, callback) {
  */
 MemoryTransport.prototype.updated = function(paramd, callback) {
     var self = this;
-
-    if (arguments.length === 1) {
-        paramd = {};
-        callback = arguments[0];
-    }
 
     self._validate_updated(paramd, callback);
 
