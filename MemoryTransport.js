@@ -80,6 +80,7 @@ MemoryTransport.prototype._class = "MemoryTransport";
  */
 MemoryTransport.prototype.list = function(paramd, callback) {
     var self = this;
+    var ld;
 
     self._validate_list(paramd, callback);
 
@@ -87,14 +88,12 @@ MemoryTransport.prototype.list = function(paramd, callback) {
     keys.sort();
 
     keys.map(function(key) {
-        callback({
-            id: key,
-        });
+        ld = _.shallowCopy(paramd);
+        ld.id = key;
+        callback(null, ld);
     });
 
-    callback({
-        end: true,
-    });
+    callback(null, null);
 };
 
 /**

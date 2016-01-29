@@ -21,13 +21,13 @@ var _update = function() {
             last: "Janes",
             now: now,
         },
-    }, function(error, ud) {
+    }, function(error, pd) {
         if (error) {
             console.log("#", error);
             return;
         }
 
-        console.log("+ sent", ud);
+        console.log("+ sent", pd);
     });
 };
 
@@ -36,14 +36,17 @@ _update();
 /* --- read --- */
 var read_transport = new Transport({});
 
-var received = function(ud) {
-    if (ud.error) {
-        console.log("#", "received.error", _.error.message(ud.error));
-    } else if (ud.end) {
-        console.log("+", "received.end");
-    } else {
-        console.log("+", "received.update", ud.id);
+var received = function(erorr, ld) {
+    if (error) {
+        console.log("#", "error", error);
+        return;
     }
+    if (!ld) {
+        console.log("+", "<end>");
+        break;
+    }
+
+    console.log("+", "received.update", ld.id);
 }
 
 read_transport.list({}, received);

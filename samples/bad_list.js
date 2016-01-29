@@ -13,9 +13,14 @@ var Transport = require('../MemoryTransport').MemoryTransport;
 
 var transport = new Transport({
 });
-transport.list({}, function(ld) {
-    if (ld.error || ld.end) {
+transport.list({}, function(error, ld) {
+    if (error) {
+        console.log("#", "error", error);
         return;
+    }
+    if (!ld) {
+        console.log("+", "<end>");
+        break;
     }
 
     console.log("+", ld.id);
