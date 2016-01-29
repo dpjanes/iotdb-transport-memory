@@ -141,21 +141,19 @@ MemoryTransport.prototype.bands = function(paramd, callback) {
 
     self._validate_bands(paramd, callback);
 
-    paramd = _.shallowCopy(paramd);
+    var bd = _.shallowCopy(paramd);
+    bd.bandd = {};
 
     var bdd = self.bddd[paramd.id];
     if (bdd === undefined) {
-        paramd.error = new Error("not found");
-        paramd.value = null;
-        return callback(paramd);
+        return callback(new errors.NotFound(), bd);
     }
 
-    paramd.bandd = {};
     _.keys(bdd).map(function(key) {
-        paramd.bandd[key] = null;
+        bd.bandd[key] = null;
     };
 
-    callback(paramd);
+    callback(null, bd);
 };
 
 /**

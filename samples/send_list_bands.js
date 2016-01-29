@@ -44,8 +44,13 @@ var received = function(ud) {
     } else {
         console.log("+", "received.update", ud.id);
 
-        read_transport.about(ud, function(ad) {
-            console.log("+", "received.about", ud.id, ad.bands);
+        read_transport.bands(ud, function(error, ad) {
+            if (error) {
+                console.log("#", "received.bands", error);
+                return;
+            }
+
+            console.log("+", "received.bands", ad.id, ad.bandd);
         });
     }
 }
