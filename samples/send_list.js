@@ -36,7 +36,7 @@ _update();
 /* --- read --- */
 var read_transport = new Transport({});
 
-var received = function(erorr, ld) {
+var received = function(error, ld) {
     if (error) {
         console.log("#", "error", error);
         return;
