@@ -38,10 +38,15 @@ var logger = iotdb.logger({
     module: 'MemoryTransport',
 });
 
-var global = {};
+var global_bddd = {};
 
 var global_emitter = new events.EventEmitter();
 global_emitter.setMaxListeners(0);
+
+var _encode;
+var _decode;
+var _unpack;
+var _pack;
 
 /* --- constructor --- */
 
@@ -52,8 +57,7 @@ var MemoryTransport = function (initd, bddd) {
     var self = this;
 
     self.initd = _.defaults(
-        initd,
-        {
+        initd, {
             channel: iotdb_transport.channel,
             unchannel: iotdb_transport.unchannel,
             encode: _encode,
@@ -61,16 +65,15 @@ var MemoryTransport = function (initd, bddd) {
             pack: _pack,
             unpack: _unpack,
         },
-        iotdb.keystore().get("/transports/MemoryTransport/initd"),
-        {
+        iotdb.keystore().get("/transports/MemoryTransport/initd"), {
             prefix: ""
         }
     );
-    
-    self.bddd = bddd || global;
+
+    self.bddd = bddd || global_bddd;
 };
 
-MemoryTransport.prototype = new iotdb_transport.Transport;
+MemoryTransport.prototype = new iotdb_transport.Transport();
 MemoryTransport.prototype._class = "MemoryTransport";
 
 /* --- methods --- */
@@ -78,7 +81,7 @@ MemoryTransport.prototype._class = "MemoryTransport";
 /**
  *  See {iotdb_transport.Transport#Transport} for documentation.
  */
-MemoryTransport.prototype.list = function(paramd, callback) {
+MemoryTransport.prototype.list = function (paramd, callback) {
     var self = this;
     var ld;
 
@@ -87,7 +90,7 @@ MemoryTransport.prototype.list = function(paramd, callback) {
     var keys = _.keys(self.bddd);
     keys.sort();
 
-    keys.map(function(key) {
+    keys.map(function (key) {
         ld = _.shallowCopy(paramd);
         ld.id = key;
         callback(null, ld);
@@ -99,7 +102,7 @@ MemoryTransport.prototype.list = function(paramd, callback) {
 /**
  *  See {iotdb_transport.Transport#Transport} for documentation.
  */
-MemoryTransport.prototype.added = function(paramd, callback) {
+MemoryTransport.prototype.added = function (paramd, callback) {
     var self = this;
 
     self._validate_added(paramd, callback);
@@ -110,7 +113,7 @@ MemoryTransport.prototype.added = function(paramd, callback) {
 /**
  *  See {iotdb_transport.Transport#Transport} for documentation.
  */
-MemoryTransport.prototype.get = function(paramd, callback) {
+MemoryTransport.prototype.get = function (paramd, callback) {
     var self = this;
 
     self._validate_get(paramd, callback);
@@ -135,7 +138,7 @@ MemoryTransport.prototype.get = function(paramd, callback) {
 /**
  *  See {iotdb_transport.Transport#Transport} for documentation.
  */
-MemoryTransport.prototype.bands = function(paramd, callback) {
+MemoryTransport.prototype.bands = function (paramd, callback) {
     var self = this;
 
     self._validate_bands(paramd, callback);
@@ -148,9 +151,9 @@ MemoryTransport.prototype.bands = function(paramd, callback) {
         return callback(new errors.NotFound(), bd);
     }
 
-    _.keys(bdd).map(function(key) {
+    _.keys(bdd).map(function (key) {
         bd.bandd[key] = null;
-    };
+    });
 
     callback(null, bd);
 };
@@ -158,7 +161,7 @@ MemoryTransport.prototype.bands = function(paramd, callback) {
 /**
  *  See {iotdb_transport.Transport#Transport} for documentation.
  */
-MemoryTransport.prototype.put = function(paramd, callback) {
+MemoryTransport.prototype.put = function (paramd, callback) {
     var self = this;
 
     self._validate_update(paramd, callback);
@@ -181,12 +184,12 @@ MemoryTransport.prototype.put = function(paramd, callback) {
 /**
  *  See {iotdb_transport.Transport#Transport} for documentation.
  */
-MemoryTransport.prototype.updated = function(paramd, callback) {
+MemoryTransport.prototype.updated = function (paramd, callback) {
     var self = this;
 
     self._validate_updated(paramd, callback);
 
-    global_emitter.on("updated", function(bddd, ud) {
+    global_emitter.on("updated", function (bddd, ud) {
         if (paramd.id && (paramd.id !== ud.id)) {
             return;
         }
@@ -202,7 +205,7 @@ MemoryTransport.prototype.updated = function(paramd, callback) {
 /**
  *  See {iotdb_transport.Transport#Transport} for documentation.
  */
-MemoryTransport.prototype.remove = function(paramd, callback) {
+MemoryTransport.prototype.remove = function (paramd, callback) {
     var self = this;
 
     self._validate_remove(paramd, callback);
@@ -211,24 +214,24 @@ MemoryTransport.prototype.remove = function(paramd, callback) {
 };
 
 /* --- internals --- */
-var _encode = function(s) {
-    return s.replace(/[\/$%#.\]\[]/g, function(c) {
+var _encode = function (s) {
+    return s.replace(/[\/$%#.\]\[]/g, function (c) {
         return '%' + c.charCodeAt(0).toString(16);
     });
 };
 
-var _decode = function(s) {
+var _decode = function (s) {
     return decodeURIComponent(s);
-}
+};
 
-var _unpack = function(d) {
+var _unpack = function (d) {
     return _.d.transform(d, {
         pre: _.ld_compact,
         key: _decode,
     });
 };
 
-var _pack = function(d) {
+var _pack = function (d) {
     return _.d.transform(d, {
         pre: _.ld_compact,
         key: _encode,
