@@ -8,6 +8,30 @@
 
 var Transport = require('../MemoryTransport').MemoryTransport;
 
+/* --- read --- */
+var read_transport = new Transport({});
+
+var received = function(error, ud) {
+    if (error) {
+        console.log("#", error);
+        return;
+    }
+
+    if (ud.value === undefined) {
+        read_transport.get(ud, function(error, gd) {
+            if (error) {
+                console.log("#", error);
+                return;
+            }
+            console.log("+", "received.update+get", gd.id, gd.band, gd.value);
+        });
+    } else {
+        console.log("+", "received.update", ud.id, ud.band, ud.value);
+    }
+}
+
+read_transport.updated({}, received);
+
 /* --- write--- */
 var write_transport = new Transport({});
 
@@ -33,26 +57,3 @@ var _update = function() {
 setInterval(_update, 5 * 1000);
 _update();
 
-/* --- read --- */
-var read_transport = new Transport({});
-
-var received = function(error, ud) {
-    if (error) {
-        console.log("#", error);
-        return;
-    }
-
-    if (ud.value === undefined) {
-        read_transport.get(ud, function(error, gd) {
-            if (error) {
-                console.log("#", error);
-                return;
-            }
-            console.log("+", "received.update+get", gd.id, gd.band, gd.value);
-        });
-    } else {
-        console.log("+", "received.update", ud.id, ud.band, ud.value);
-    }
-}
-
-read_transport.updated({}, received);
