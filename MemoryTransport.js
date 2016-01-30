@@ -91,7 +91,7 @@ MemoryTransport.prototype.list = function (paramd, callback) {
     keys.sort();
 
     keys.map(function (key) {
-        ld = _.shallowCopy(paramd);
+        ld = _.d.clone.shallow(paramd);
         ld.id = key;
         callback(null, ld);
     });
@@ -118,7 +118,7 @@ MemoryTransport.prototype.get = function (paramd, callback) {
 
     self._validate_get(paramd, callback);
 
-    paramd = _.shallowCopy(paramd);
+    paramd = _.d.clone.shallow(paramd);
     paramd.value = null;
 
     var bdd = self.bddd[paramd.id];
@@ -143,7 +143,7 @@ MemoryTransport.prototype.bands = function (paramd, callback) {
 
     self._validate_bands(paramd, callback);
 
-    var bd = _.shallowCopy(paramd);
+    var bd = _.d.clone.shallow(paramd);
     bd.bandd = {};
 
     var bdd = self.bddd[paramd.id];
@@ -166,7 +166,7 @@ MemoryTransport.prototype.put = function (paramd, callback) {
 
     self._validate_update(paramd, callback);
 
-    var pd = _.shallowCopy(paramd);
+    var pd = _.d.clone.shallow(paramd);
 
     var bdd = self.bddd[paramd.id];
     if (bdd === undefined) {
@@ -210,7 +210,7 @@ MemoryTransport.prototype.remove = function (paramd, callback) {
 
     self._validate_remove(paramd, callback);
 
-    var rd = _.shallowCopy(paramd);
+    var rd = _.d.clone.shallow(paramd);
     delete rd.band;
     delete rd.value;
 
