@@ -43,7 +43,7 @@ var received = function(error, ld) {
     }
     if (!ld) {
         console.log("+", "<end>");
-        break;
+        return;
     }
 
     console.log("+", "received.update", ld.id);
