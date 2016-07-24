@@ -12,5 +12,6 @@ const _ = require("iotdb")._;
 const testers = require("./testers");
 
 const transport = transporter.make();
-testers.put(transport);
+testers.put(transport, { id: "ThingA" });
+testers.put(transport, { id: "ThingB" });
 testers.list(transport);

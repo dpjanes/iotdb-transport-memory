@@ -27,17 +27,19 @@ const log_value = what => [
     () => console.log("+", what, "<end>")
 ];
 
-const put = transport => {
+const put = ( transport, d ) => {
+    d = _.d.compose.shallow(d, {
+        id: "MyThingID", 
+        band: "meta", 
+        value: {
+            first: "David",
+            last: "Janes",
+            now: _.timestamp.make(),
+        },
+    });
+
     transport
-        .put({
-            id: "MyThingID", 
-            band: "meta", 
-            value: {
-                first: "David",
-                last: "Janes",
-                now: _.timestamp.make(),
-            },
-        })
+        .put(d)
         .subscribe(...log_value("put"));
 }
 
