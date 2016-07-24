@@ -3,25 +3,15 @@
  *
  *  David Janes
  *  IOTDB.org
- *  2016-01-18
+ *  2016-07-24
  *
- *  Deal with data that does not exist
- *  Expect to see just 'null'
+ *  No data
  */
 
-var Transport = require('../MemoryTransport').MemoryTransport;
+const transporter = require("../transporter");
+const _ = require("iotdb")._;
 
-var transport = new Transport({
-});
-transport.list({}, function(error, ld) {
-    if (error) {
-        console.log("#", "error", error);
-        return;
-    }
-    if (!ld) {
-        console.log("+", "<end>");
-        return;
-    }
+const testers = require("./testers");
 
-    console.log("+", ld.id);
-});
+const transport = transporter.make();
+testers.list(transport);
