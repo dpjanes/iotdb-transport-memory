@@ -97,7 +97,6 @@ const make = (initd, bddd) => {
             .sort()
             .forEach(band => {
                 d = _.d.clone.shallow(d);
-                d.id = id;
                 d.band = band;
 
                 observer.onNext(d);
