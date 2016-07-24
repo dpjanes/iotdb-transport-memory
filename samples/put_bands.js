@@ -1,5 +1,5 @@
 /*
- *  send_list.js
+ *  put_bands.js
  *
  *  David Janes
  *  IOTDB.org
@@ -12,6 +12,7 @@ const _ = require("iotdb")._;
 const testers = require("./testers");
 
 const transport = transporter.make();
-testers.put(transport, { id: "ThingA" });
-testers.put(transport, { id: "ThingB" });
-testers.list(transport);
+testers.put(transport, { band: "meta" });
+testers.put(transport, { band: "model" });
+testers.put(transport, { band: "istate" });
+testers.bands(transport);

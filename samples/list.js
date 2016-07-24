@@ -1,11 +1,9 @@
 /*
- *  bad_list.js
+ *  list.js
  *
  *  David Janes
  *  IOTDB.org
  *  2016-07-24
- *
- *  No data
  */
 
 const transporter = require("../transporter");
