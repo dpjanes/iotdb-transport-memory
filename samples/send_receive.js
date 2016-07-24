@@ -1,67 +1,17 @@
 /*
- *  send_reveive.js
+ *  put_updated.js
  *
  *  David Janes
  *  IOTDB.org
- *  2016-01-18
+ *  2016-07-24
  */
 
-var Transport = require('../MemoryTransport').MemoryTransport;
+const transporter = require("../transporter");
+const _ = require("iotdb")._;
 
-/* --- write--- */
-var write_transport = new Transport({});
+const testers = require("./testers");
 
-var _update = function() {
-    var now = (new Date()).toISOString();
-    write_transport.put({
-        id: "MyThingID", 
-        band: "meta", 
-        value: {
-            first: "David",
-            last: "Janes",
-            now: now,
-        },
-    }, function(error, ud) {
-        if (error) {
-            console.log("#", error);
-            return;
-        }
-        console.log("+ sent", ud);
-    });
-};
+const transport = transporter.make();
+setInterval(() => testers.put(transport), 2000);
 
-setInterval(_update, 5 * 1000);
-_update();
-
-/* --- read --- */
-var read_transport = new Transport({});
-
-var received = function(error, ud) {
-    if (error) {
-        console.log("#", error);
-        return;
-    }
-
-    if (ud.value === undefined) {
-        read_transport.get(ud, function(error, gd) {
-            if (error) {
-                console.log("#", error);
-                return;
-            }
-            console.log("+", "received.update+get", gd.id, gd.band, gd.value);
-        });
-    } else {
-        console.log("+", "received.update", ud.id, ud.band, ud.value);
-    }
-}
-
-read_transport.get({
-    id: "MyThingID", 
-    band: "meta", 
-}, received);
-read_transport.updated({
-    id: "MyThingID", 
-    band: "meta", 
-}, received);
-
-
+testers.updated(transport);

@@ -49,11 +49,20 @@ const list = transport => {
         .subscribe(...log_id("list"));
 };
 
-const bands = transport => {
+const bands = ( transport, d ) => {
+    d = _.d.compose.shallow(d, { id: "MyThingID" });
     transport
-        .bands({ id: "MyThingID" })
+        .bands(d)
         .subscribe(...log_band("bands"));
 };
+
+const updated = ( transport, d ) => {
+    d = _.d.compose.shallow(d, {});
+    transport
+        .updated(d)
+        .subscribe(...log_value("updated"));
+};
+
 
 /*
  *  API
@@ -64,3 +73,4 @@ exports.log_band = log_band;
 exports.put = put;
 exports.list = list;
 exports.bands = bands;
+exports.updated = updated;

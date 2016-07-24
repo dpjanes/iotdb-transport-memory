@@ -40,8 +40,7 @@ const logger = iotdb.logger({
 
 const global_bddd = {};
 
-const global_emitter = new events.EventEmitter();
-global_emitter.setMaxListeners(0);
+const _subject = new Rx.Subject();
 
 const make = (initd, bddd) => {
     const self = iotdb_transport.make();
@@ -87,7 +86,7 @@ const make = (initd, bddd) => {
         observer.onNext(d);
         observer.onCompleted();
 
-        global_emitter.emit("updated", _bddd, d);
+        _subject.onNext(d);
     };
     
     self.rx.bands = (observer, d) => {
@@ -103,6 +102,17 @@ const make = (initd, bddd) => {
             });
 
         observer.onCompleted();
+    };
+
+    self.rx.updated = (observer, paramd) => {
+        _subject
+            .filter(d => !paramd.id || paramd.id === d.id)
+            .filter(d => !paramd.band || paramd.id === d.band)
+            .subscribe(
+                d => observer.onNext(d),
+                error => observer.onError(error),
+                () => observer.onCompleted()
+            );
     };
 
 
