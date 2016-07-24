@@ -89,6 +89,21 @@ const make = (initd, bddd) => {
         _subject.onNext(d);
     };
     
+    self.rx.get = (observer, d) => {
+        let bdd = _bddd[d.id];
+        if (!_.is.Undefined(bdd)) {
+            const bd = bdd[d.band];
+            if (!_.is.Undefined(bd)) {
+                d = _.d.clone.shallow(d);
+                d.value = bd;
+
+                observer.onNext(d);
+            }
+        }
+
+        observer.onCompleted();
+    };
+    
     self.rx.bands = (observer, d) => {
         let bdd = _bddd[d.id];
         
@@ -104,10 +119,11 @@ const make = (initd, bddd) => {
         observer.onCompleted();
     };
 
-    self.rx.updated = (observer, paramd) => {
+    self.rx.updated = (observer, d) => {
         _subject
-            .filter(d => !paramd.id || paramd.id === d.id)
-            .filter(d => !paramd.band || paramd.id === d.band)
+            .filter(ud => !d.id || d.id === ud.id)
+            .filter(ud => !d.band || d.id === ud.band)
+            .map(ud => _.d.compose.shallow(d, ud))
             .subscribe(
                 d => observer.onNext(d),
                 error => observer.onError(error),
