@@ -1,5 +1,5 @@
 /*
- *  put_updated.js
+ *  put_wildcard.js
  *
  *  David Janes
  *  IOTDB.org
