@@ -39,8 +39,7 @@ const logger = iotdb.logger({
 });
 
 const global_bddd = {};
-
-const _subject = new Rx.Subject();
+const subjectd = new Map();
 
 const make = (initd, bddd) => {
     const self = iotdb_transport.make();
@@ -60,6 +59,10 @@ const make = (initd, bddd) => {
     );
 
     const _bddd = bddd || global_bddd;
+    let _subject = subjectd.get(_bddd);
+    if (!_subject) {
+        subjectd.set(_bddd, _subject = new Rx.Subject());
+    }
 
     self.rx.list = (observer, d) => {
         _.keys(_bddd)

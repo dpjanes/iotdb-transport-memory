@@ -9,7 +9,7 @@
 const transporter = require("../transporter");
 const _ = require("iotdb")._;
 
-const testers = require("./testers");
+const testers = require("iotdb-transport").testers;
 
 const transport = transporter.make();
 testers.put(transport, { id: "ThingA" });
