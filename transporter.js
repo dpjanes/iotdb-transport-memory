@@ -68,10 +68,10 @@ const make = (initd, bddd) => {
         _.keys(_bddd)
             .sort()
             .forEach(id => {
-                d = _.d.clone.shallow(d);
-                d.id = id;
+                const rd = _.d.clone.shallow(d);
+                rd.id = id;
 
-                observer.onNext(d);
+                observer.onNext(rd);
             });
 
         observer.onCompleted();
@@ -79,17 +79,37 @@ const make = (initd, bddd) => {
 
     self.rx.put = (observer, d) => {
         let bdd = _bddd[d.id];
-        if (_.is.Undefined(bdd)) {
+
+        let changed = false;
+
+        const rd = _.d.clone.shallow(d);
+        rd.value = _.timestamp.add(rd.value);
+
+        if (_.is.Undefined(bdd) || _.is.Undefined(bdd[d.band])) {
             bdd = {};
+            bdd[d.band] = rd.value;
+
             _bddd[d.id] = bdd;
+
+            changed = true;
+        } else {
+            const old_value = bdd[d.band];
+            if (_.timestamp.check.dictionary(old_value, rd.value)) {
+                bdd[d.band] = rd.value;
+                changed = true;
+            } else if (d.silent_timestamp === false) {
+                rd.value = old_value;
+            } else {
+                return observer.onError(new errors.Timestamp());
+            }
         }
 
-        bdd[d.band] = d.value;
-
-        observer.onNext(d);
+        observer.onNext(rd);
         observer.onCompleted();
 
-        _subject.onNext(d);
+        if (changed) {
+            _subject.onNext(d);
+        }
     };
     
     self.rx.get = (observer, d) => {
@@ -97,10 +117,10 @@ const make = (initd, bddd) => {
         if (!_.is.Undefined(bdd)) {
             const bd = bdd[d.band];
             if (!_.is.Undefined(bd)) {
-                d = _.d.clone.shallow(d);
-                d.value = bd;
+                const rd = _.d.clone.shallow(d);
+                rd.value = bd;
 
-                observer.onNext(d);
+                observer.onNext(rd);
             }
         }
 
@@ -113,10 +133,10 @@ const make = (initd, bddd) => {
         _.keys(bdd || {})
             .sort()
             .forEach(band => {
-                d = _.d.clone.shallow(d);
-                d.band = band;
+                const rd = _.d.clone.shallow(d);
+                rd.band = band;
 
-                observer.onNext(d);
+                observer.onNext(rd);
             });
 
         observer.onCompleted();
