@@ -45,17 +45,8 @@ const make = (initd, bddd) => {
     const self = iotdb_transport.make();
 
     const _initd = _.d.compose.shallow(
-        initd, {
-            channel: iotdb_transport.channel,
-            unchannel: iotdb_transport.unchannel,
-            encode: s => s.replace(/[\/$%#.\]\[]/g, c => '%' + c.charCodeAt(0).toString(16)),
-            decode: decodeURIComponent,
-            pack: d => _.d.transform(d, { pre: _.ld_compact, key: _encode, }),
-            unpack: d => _.d.transform(d, { pre: _.ld_compact, key: _decode, }),
-        },
-        iotdb.keystore().get("/transports/MemoryTransport/initd"), {
-            prefix: ""
-        }
+        initd, 
+        iotdb.keystore().get("/transports/iotdb-transport-memory/initd"), {}
     );
 
     const _bddd = bddd || global_bddd;
@@ -80,8 +71,6 @@ const make = (initd, bddd) => {
     self.rx.put = (observer, d) => {
         let bdd = _bddd[d.id];
 
-        let changed = false;
-
         const rd = _.d.clone.shallow(d);
         rd.value = _.timestamp.add(rd.value);
 
@@ -91,25 +80,26 @@ const make = (initd, bddd) => {
 
             _bddd[d.id] = bdd;
 
-            changed = true;
+            observer.onNext(rd);
+            observer.onCompleted();
+
+            _subject.onNext(d);
         } else {
             const old_value = bdd[d.band];
             if (_.timestamp.check.dictionary(old_value, rd.value)) {
                 bdd[d.band] = rd.value;
-                changed = true;
+
+                observer.onNext(rd);
+                observer.onCompleted();
+
+                _subject.onNext(d);
             } else if (d.silent_timestamp === false) {
-                rd.value = old_value;
+                observer.onCompleted();
             } else {
-                return observer.onError(new errors.Timestamp());
+                observer.onError(new errors.Timestamp());
             }
         }
 
-        observer.onNext(rd);
-        observer.onCompleted();
-
-        if (changed) {
-            _subject.onNext(d);
-        }
     };
     
     self.rx.get = (observer, d) => {
