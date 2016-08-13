@@ -69,41 +69,37 @@ const make = (initd, bddd) => {
     };
 
     self.rx.put = (observer, d) => {
-        let bdd = _bddd[d.id];
-
         const rd = _.d.clone.shallow(d);
         rd.value = _.timestamp.add(rd.value);
 
-        if (_.is.Undefined(bdd) || _.is.Undefined(bdd[d.band])) {
+        let bdd = _bddd[d.id];
+        if (_.is.Undefined(bdd)) {
             bdd = {};
-            bdd[d.band] = rd.value;
-
             _bddd[d.id] = bdd;
+        }
+
+        let bd = bdd[d.band];
+        if (_.is.Undefined(bd)) {
+            bd = {};
+        }
+        
+        if (_.timestamp.check.dictionary(bd, rd.value)) {
+            bdd[d.band] = rd.value;
 
             observer.onNext(rd);
             observer.onCompleted();
 
             _subject.onNext(d);
+        } else if (d.silent_timestamp === false) {
+            observer.onCompleted();
         } else {
-            const old_value = bdd[d.band];
-            if (_.timestamp.check.dictionary(old_value, rd.value)) {
-                bdd[d.band] = rd.value;
-
-                observer.onNext(rd);
-                observer.onCompleted();
-
-                _subject.onNext(d);
-            } else if (d.silent_timestamp === false) {
-                observer.onCompleted();
-            } else {
-                observer.onError(new errors.Timestamp());
-            }
+            observer.onError(new errors.Timestamp());
         }
 
     };
     
     self.rx.get = (observer, d) => {
-        let bdd = _bddd[d.id];
+        const bdd = _bddd[d.id];
         if (!_.is.Undefined(bdd)) {
             const bd = bdd[d.band];
             if (!_.is.Undefined(bd)) {
@@ -118,8 +114,8 @@ const make = (initd, bddd) => {
     };
     
     self.rx.bands = (observer, d) => {
-        let bdd = _bddd[d.id];
-        
+        const bdd = _bddd[d.id];
+
         _.keys(bdd || {})
             .sort()
             .forEach(band => {
