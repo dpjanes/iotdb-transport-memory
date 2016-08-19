@@ -83,40 +83,43 @@ const make = (initd, bddd) => {
             bd = {};
         }
         
-        if (_.timestamp.check.dictionary(bd, rd.value)) {
-            bdd[d.band] = rd.value;
-
-            observer.onNext(rd);
-            observer.onCompleted();
-
-            _subject.onNext(d);
-        } else if (d.silent_timestamp === false) {
-            observer.onCompleted();
-        } else {
-            observer.onError(new errors.Timestamp());
+        if (!_.timestamp.check.dictionary(bd, rd.value)) {
+            return observer.onError(new errors.Timestamp());
         }
 
+        bdd[d.band] = rd.value;
+
+        observer.onNext(rd);
+        observer.onCompleted();
+
+        _subject.onNext(d);
     };
     
     self.rx.get = (observer, d) => {
         const bdd = _bddd[d.id];
-        if (!_.is.Undefined(bdd)) {
-            const bd = bdd[d.band];
-            if (!_.is.Undefined(bd)) {
-                const rd = _.d.clone.shallow(d);
-                rd.value = bd;
-
-                observer.onNext(rd);
-            }
+        if (_.is.Undefined(bdd)) {
+            return observer.onError(new errors.NotFound());
         }
 
+        const bd = bdd[d.band];
+        if (_.is.Undefined(bd)) {
+            return observer.onError(new errors.NotFound());
+        }
+
+        const rd = _.d.clone.shallow(d);
+        rd.value = bd;
+
+        observer.onNext(rd);
         observer.onCompleted();
     };
     
     self.rx.bands = (observer, d) => {
         const bdd = _bddd[d.id];
+        if (!bdd) {
+            return observer.onError(new errors.NotFound());
+        }
 
-        _.keys(bdd || {})
+        _.keys(bdd)
             .sort()
             .forEach(band => {
                 const rd = _.d.clone.shallow(d);
