@@ -28,20 +28,20 @@ const iotdb = require("iotdb");
 iotdb.use("homestar-wemo");
 
 // our source
-const iotdb_transporter = require("../../iotdb-transport-iotdb/transporter");
-const iotdb_transport = iotdb_transporter.make({}, iotdb.connect("WeMoSocket"));
-iotdb_transport
+const iotdb_transport = require("../../iotdb-transport-iotdb/transporter");
+const iotdb_transporter = iotdb_transport.make({}, iotdb.connect("WeMoSocket"));
+iotdb_transporter
     .updated({})
-    .subscribe(...testers.log_value("iotdb_transport.updated"));
+    .subscribe(...testers.log_value("iotdb_transporter.updated"));
 
 // our passive destination
-const memory_transporter = require("../transporter")
-const memory_1_transport = memory_transporter.make();
-memory_1_transport
+const memory_transport = require("../transporter")
+const memory_1_transporter = memory_transport.make();
+memory_1_transporter
     .updated({})
     .subscribe(...testers.log_value("memory_1.updated"));
 
 // our active desstination - all changes to iotdb will reflect into this and visaversa
-const memory_2_transport = memory_transporter.make();
-memory_2_transport.monitor(iotdb_transport)
-iotdb_transport.monitor(memory_2_transport)
+const memory_2_transporter = memory_transport.make();
+memory_2_transporter.monitor(iotdb_transporter)
+iotdb_transporter.monitor(memory_2_transporter)
