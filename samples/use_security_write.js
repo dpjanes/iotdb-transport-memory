@@ -1,5 +1,5 @@
 /*
- *  use_access_read.js
+ *  use_access_write.js
  *
  *  David Janes
  *  IOTDB.org
@@ -36,7 +36,7 @@ testers.put(memory_transporter, { id: "ThingB", band: "ostate" });
 // the access wrapper
 const access_transport = require("../../iotdb-transport/").access;
 const access_transporter = access_transport.make({
-    check_read: d => {
+    check_write: d => {
         if (d.id === "ThingB") {
             return new Error("access denied");
         }
@@ -44,7 +44,10 @@ const access_transporter = access_transport.make({
 });
 access_transporter.use(memory_transporter)
 
-testers.list(access_transporter);                   // this will not see ThingB
-testers.get(access_transporter, { id: "ThingA" })
-testers.get(access_transporter, { id: "ThingB" })   // this will fail
-testers.get(memory_transporter, { id: "ThingB" })
+testers.list(access_transporter);                   // this will see everything
+testers.get(access_transporter, { id: "ThingA" })   // this will work
+testers.get(access_transporter, { id: "ThingB" })   // this will work
+testers.get(memory_transporter, { id: "ThingB" })   // this will work
+console.log("-");
+testers.put(access_transporter, { id: "ThingA" })   // this will work
+testers.put(access_transporter, { id: "ThingB" })   // this will fail
