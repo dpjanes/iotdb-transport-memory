@@ -43,6 +43,7 @@ const subjectd = new Map();
 
 const make = (initd, bddd) => {
     const self = iotdb_transport.make();
+    self.name = "iotdb-transport-memory";
 
     const _initd = _.d.compose.shallow(
         initd, 

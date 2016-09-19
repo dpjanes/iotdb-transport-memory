@@ -41,8 +41,7 @@ const access_transporter = access_transport.make({
             return new Error("access denied");
         }
     }
-});
-access_transporter.use(memory_transporter)
+}, memory_transporter)
 
 testers.list(access_transporter);                   // this will see everything
 testers.get(access_transporter, { id: "ThingA" })   // this will work

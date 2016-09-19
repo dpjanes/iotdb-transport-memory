@@ -1,13 +1,16 @@
-# iotdb-transport-prototype
-IOTDB in-memory Transporter 
+# iotdb-transport-memory
+[IOTDB](https://github.com/dpjanes/node-iotdb) 
+[Transporter](https://github.com/dpjanes/node-iotdb/blob/master/docs/transporters.md)
+for in-memory 
 
 <img src="https://raw.githubusercontent.com/dpjanes/iotdb-homestar/master/docs/HomeStar.png" align="right" />
 
-# Introduction
+# About
 
-Read about Transporters [here](https://github.com/dpjanes/iotdb-transport).
 This Transporter works "in-memory" and probably is best used for testing 
 more than anything practicle.
+
+* [Read more about Transporters](https://github.com/dpjanes/node-iotdb/blob/master/docs/transporters.md)
 
 # Use
 
