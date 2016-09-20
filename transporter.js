@@ -144,6 +144,15 @@ const make = (initd, bddd) => {
             );
     };
 
+    self.rx.remove = (observer, d) => {
+        const bdd = _bddd[d.id];
+        if (!bdd) {
+            return observer.onError(new errors.NotFound());
+        }
+
+        delete _bddd[d.id];
+        observer.onCompleted()
+    };
 
     return self;
 };
