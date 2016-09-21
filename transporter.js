@@ -73,10 +73,12 @@ const make = (initd, bddd) => {
         const rd = _.d.clone.shallow(d);
         rd.value = _.timestamp.add(rd.value);
 
+        let added = false;
         let bdd = _bddd[d.id];
         if (_.is.Undefined(bdd)) {
             bdd = {};
             _bddd[d.id] = bdd;
+            added = true;
         }
 
         let bd = bdd[d.band];
@@ -94,6 +96,15 @@ const make = (initd, bddd) => {
         observer.onCompleted();
 
         _subject.onNext(d);
+
+        if (added) {
+            process.nextTick(() => {
+                _subject.onNext({
+                    id: d.id,
+                    __added: true,
+                });
+            });
+        }
     };
     
     self.rx.get = (observer, d) => {
@@ -134,6 +145,7 @@ const make = (initd, bddd) => {
 
     self.rx.updated = (observer, d) => {
         _subject
+            .filter(ud => !ud.__added)
             .filter(ud => !d.id || d.id === ud.id)
             .filter(ud => !d.band || d.id === ud.band)
             .map(ud => _.d.compose.shallow(d, ud))
@@ -152,6 +164,21 @@ const make = (initd, bddd) => {
 
         delete _bddd[d.id];
         observer.onCompleted()
+    };
+
+    self.rx.added = (observer, d) => {
+        _subject
+            .filter(ud => ud.__added)
+            .map(ud => {
+                const ad = _.d.compose.shallow(d, ud);
+                delete ad.__added
+                return ad;
+            })
+            .subscribe(
+                d => observer.onNext(d),
+                error => observer.onError(error),
+                () => observer.onCompleted()
+            );
     };
 
     return self;
