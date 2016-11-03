@@ -28,7 +28,6 @@ const iotdb_transport = require('iotdb-transport');
 const errors = require('iotdb-errors');
 
 const Rx = require('rx');
-const events = require('events');
 
 const util = require('util');
 const url = require('url');
